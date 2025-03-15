@@ -1,0 +1,3 @@
+/Users/max/CLionProjects/kolang2/cmake-build-debug/CMakeFiles/Korlang.dir
+/Users/max/CLionProjects/kolang2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/max/CLionProjects/kolang2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
