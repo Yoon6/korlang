@@ -4,7 +4,9 @@
 
 #ifndef KORLANG_KIND_H
 #define KORLANG_KIND_H
+
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -35,4 +37,8 @@ enum class Kind {
     LeftBrace, RightBrace,
     LeftBraket, RightBraket,
 };
+
+auto toKind(const wstring&) -> Kind;
+auto toString(Kind)->wstring;
+
 #endif //KORLANG_KIND_H

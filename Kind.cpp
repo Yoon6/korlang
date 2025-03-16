@@ -5,53 +5,74 @@
 #include "Kind.h"
 #include <map>
 
-static map<string, Kind> stringToToken = {
-        {"#unknown",    Kind::Unknown},
-        {"#끝", Kind::EndOfLine},
+static map<wstring, Kind> stringToKind = {
+        {L"#unknown", Kind::Unknown},
+        {L"#끝",       Kind::EndOfLine},
 
-        {"빈값",        Kind::NullLiteral},
-        {"참",        Kind::TrueLiteral},
-        {"거짓",       Kind::FalseLiteral},
-        {"#숫자-리터럴",     Kind::NumberLiteral},
-        {"#문자열-리터럴",     Kind::StringLiteral},
-        {"#식별자",    Kind::Identifier},
+        {L"빈값",       Kind::NullLiteral},
+        {L"참",        Kind::TrueLiteral},
+        {L"거짓",       Kind::FalseLiteral},
+        {L"#숫자-리터럴",  Kind::NumberLiteral},
+        {L"#문자열-리터럴", Kind::StringLiteral},
+        {L"#식별자",     Kind::Identifier},
 
-        {"함수",    Kind::Function},
-        {"반환",      Kind::Return},
-        {"변수",         Kind::Variable},
-        {"반복",         Kind::For},
-        {"끊기",       Kind::Break},
-        {"계속하기",    Kind::Continue},
-        {"만약",          Kind::If},
-        {"그게아니라",        Kind::Elif},
-        {"아니면",        Kind::Else},
-        {"출력",       Kind::Print},
+        {L"함수",       Kind::Function},
+        {L"반환",       Kind::Return},
+        {L"변수",       Kind::Variable},
+        {L"반복",       Kind::For},
+        {L"끊기",       Kind::Break},
+        {L"계속하기",     Kind::Continue},
+        {L"만약",       Kind::If},
+        {L"그게아니라",    Kind::Elif},
+        {L"아니면",      Kind::Else},
+        {L"출력",       Kind::Print},
 
-        {"그리고",         Kind::LogicalAnd},
-        {"또는",          Kind::LogicalOr},
+        {L"그리고",      Kind::LogicalAnd},
+        {L"또는",       Kind::LogicalOr},
 
-        {"=",           Kind::Assignment},
+        {L"=",        Kind::Assignment},
 
-        {"+",           Kind::Add},
-        {"-",           Kind::Subtract},
-        {"*",           Kind::Multiply},
-        {"/",           Kind::Divide},
-        {"%",           Kind::Modulo},
+        {L"+",        Kind::Add},
+        {L"-",        Kind::Subtract},
+        {L"*",        Kind::Multiply},
+        {L"/",        Kind::Divide},
+        {L"%",        Kind::Modulo},
 
-        {"==",          Kind::Equal},
-        {"!=",          Kind::NotEqual},
-        {"<",           Kind::LessThan},
-        {">",           Kind::GreaterThan},
-        {"<=",          Kind::LessOrEqual},
-        {">=",          Kind::GreaterOrEqual},
+        {L"==",       Kind::Equal},
+        {L"!=",       Kind::NotEqual},
+        {L"<",        Kind::LessThan},
+        {L">",        Kind::GreaterThan},
+        {L"<=",       Kind::LessOrEqual},
+        {L">=",       Kind::GreaterOrEqual},
 
-        {",",           Kind::Comma},
-        {":",           Kind::Colon},
-        {";",           Kind::Semicolon},
-        {"(",           Kind::LeftParen},
-        {")",           Kind::RightParen},
-        {"{",           Kind::LeftBrace},
-        {"}",           Kind::RightBrace},
-        {"[",           Kind::LeftBraket},
-        {"]",           Kind::RightBraket},
+        {L",",        Kind::Comma},
+        {L":",        Kind::Colon},
+        {L";",        Kind::Semicolon},
+        {L"(",        Kind::LeftParen},
+        {L")",        Kind::RightParen},
+        {L"{",        Kind::LeftBrace},
+        {L"}",        Kind::RightBrace},
+        {L"[",        Kind::LeftBraket},
+        {L"]",        Kind::RightBraket},
 };
+
+auto toKind(const wstring& string) -> Kind {
+    if (stringToKind.count(string))
+    {
+        return stringToKind.at(string);
+    }
+    return Kind::Unknown;
+}
+
+static auto kindToString = [] {
+    map<Kind, wstring> result;
+    for (auto& [key, value] : stringToKind)
+        result[value] = key;
+    return result;
+}();
+
+auto toString(Kind type)->wstring {
+    if (kindToString.count(type))
+        return kindToString.at(type);
+    return L"";
+}
