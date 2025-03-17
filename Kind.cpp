@@ -3,7 +3,6 @@
 //
 
 #include "Kind.h"
-#include <map>
 
 static map<wstring, Kind> stringToKind = {
         {L"#unknown", Kind::Unknown},

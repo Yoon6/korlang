@@ -8,4 +8,5 @@ add_executable(Korlang main.cpp
         Kind.h
         Token.h
         Scanner.cpp
+        Node.h
 )

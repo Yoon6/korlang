@@ -5,7 +5,6 @@
 #include "Token.h"
 
 vector<Token> scan(string sourceCode);
-
 auto printTokenList(vector<Token>) -> void;
 
 int main() {
