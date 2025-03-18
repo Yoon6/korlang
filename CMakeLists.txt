@@ -9,4 +9,5 @@ add_executable(Korlang main.cpp
         Token.h
         Scanner.cpp
         Node.h
+        Parser.cpp
 )

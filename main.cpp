@@ -3,9 +3,12 @@
 #include <iomanip>
 
 #include "Token.h"
+#include "Node.h"
 
 vector<Token> scan(string sourceCode);
+Program* parse(vector<Token> tokenList);
 auto printTokenList(vector<Token>) -> void;
+auto printSyntaxTree(Program*) -> void;
 
 int main() {
     string sourceCode = R"(
@@ -18,7 +21,10 @@ int main() {
     )";
 
     vector<Token> tokenList = scan(sourceCode);
-    printTokenList(tokenList);
+	Program* syntaxTree = parse(tokenList);
+
+    printSyntaxTree(syntaxTree);
+    //printTokenList(tokenList);
 
     return 0;
 }

@@ -13,7 +13,7 @@ struct Expression {};
 typedef struct Function : Statement {
     wstring name;
     vector<wstring> parameters;
-    vector<Statement> blocks;
+    vector<Statement*> blocks;
 } Function;
 
 struct Program {
