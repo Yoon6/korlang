@@ -41,7 +41,7 @@ struct Continue : Statement {};
 
 struct If : Statement {
     vector<Expression*> conditions;
-    vector<Statement*> blocks;
+	vector<vector<Statement*>> blocks; // if, elif, else 각각의 블록
     vector<Statement*> elseBlock;
 };
 

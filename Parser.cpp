@@ -5,6 +5,8 @@
 
 static vector<Token>::iterator currentToken;
 
+vector<Statement*> parseBlock();
+
 bool skipCurrentIf(Kind kind)
 {
 	if (currentToken->kind != kind)
@@ -63,6 +65,44 @@ For* parseFor()
 	// skip '반복'
 	skipCurrent(Kind::For);
 
+	result->variable = new Variable();
+	result->variable->name = currentToken->string;
+
+	// skip variable name
+	skipCurrent(Kind::Identifier);
+	// skip =
+	skipCurrent(Kind::Assignment);
+	result->variable->expression = parseExpression();
+
+	if (result->variable->expression == nullptr)
+	{
+		cout << "for문에 초기화 식이 없습니다.";
+		exit(1);
+	}
+
+	// skip ;
+	skipCurrent(Kind::Semicolon);
+	result->condition = parseExpression();
+	if (result->condition == nullptr)
+	{
+		cout << "for문에 조건식이 없습니다.";
+		exit(1);
+	}
+
+	// skip ;
+	skipCurrent(Kind::Semicolon);
+	result->expression = parseExpression();
+	if (result->expression == nullptr)
+	{
+		cout << "for문에 증감식이 없습니다.";
+		exit(1);
+	}
+
+	// skip {
+	skipCurrent(Kind::LeftBrace);
+	result->blocks = parseBlock();
+	// skip }
+	skipCurrent(Kind::RightBrace);
 
 	return result;
 }
@@ -70,6 +110,34 @@ For* parseFor()
 If* parseIf()
 {
 	auto result = new If();
+	
+	// skip '만약'
+	skipCurrent(Kind::If);
+	do
+	{
+		auto condition = parseExpression();
+		if (condition == nullptr)
+		{
+			cout << "if문에 조건식이 없습니다.";
+			exit(1);
+		}
+		result->conditions.push_back(condition);
+		// skip {
+		skipCurrent(Kind::LeftBrace);
+		result->blocks.push_back(parseBlock());
+		// skip }
+		skipCurrent(Kind::RightBrace);
+	}
+	while (skipCurrentIf(Kind::Elif));
+
+	if (skipCurrentIf(Kind::Else))
+	{
+		// skip {
+		skipCurrent(Kind::LeftBrace);
+		result->elseBlock = parseBlock();
+		// skip }
+		skipCurrent(Kind::RightBrace);
+	}
 
 	return result;
 }
@@ -77,6 +145,19 @@ If* parseIf()
 Print* parsePrint()
 {
 	auto result = new Print();
+	// skip '출력'
+	skipCurrent(Kind::Print);
+	// skip (
+	skipCurrent(Kind::LeftParen);
+
+	// 하나의 식만 출력 가능
+	result->arguments.push_back(parseExpression());
+
+	// skip )
+	skipCurrent(Kind::RightParen);
+	// skip ;
+	skipCurrent(Kind::Semicolon);
+
 
 	return result;
 }
@@ -85,12 +166,29 @@ Return* parseReturn()
 {
 	auto result = new Return();
 
+	// skip '반환'
+	skipCurrent(Kind::Return);
+
+	result->expression = parseExpression();
+	if (result->expression == nullptr)
+	{
+		cout << "반환문에 반환값이 없습니다.";
+		exit(1);
+	}
+
+	// skip ;
+	skipCurrent(Kind::Semicolon);
+
 	return result;
 }
 
 Break* parseBreak()
 {
 	auto result = new Break();
+	// skip '끊기'
+	skipCurrent(Kind::Break);
+	// skip ;
+	skipCurrent(Kind::Semicolon);
 
 	return result;
 }
@@ -98,6 +196,10 @@ Break* parseBreak()
 Continue* parseContinue()
 {
 	auto result = new Continue();
+	// skip '계속하기'
+	skipCurrent(Kind::Continue);
+	// skip ;
+	skipCurrent(Kind::Semicolon);
 
 	return result;
 }
