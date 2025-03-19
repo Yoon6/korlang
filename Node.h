@@ -5,28 +5,37 @@
 #ifndef KORLANG_NODE_H
 #define KORLANG_NODE_H
 
+#include <vector>
 #include "Kind.h"
 
-struct Statement {};
-struct Expression {};
+struct Statement {
+    virtual auto print(int) -> void = 0;
+};
+struct Expression {
+    virtual auto print(int) -> void = 0;
+};
 
 typedef struct Function : Statement {
     wstring name;
     vector<wstring> parameters;
     vector<Statement*> blocks;
+    auto print(int) -> void;
 } Function;
 
 struct Program {
     vector<Function*> functions;
+    auto print(int) -> void;
 };
 
 struct Return : Statement {
     Expression* expression;
+    auto print(int) -> void;
 };
 
 struct Variable : Statement {
     wstring name;
     Expression* expression;
+    auto print(int) -> void;
 };
 
 struct For : Statement {
@@ -34,55 +43,69 @@ struct For : Statement {
     Expression* condition;
     Expression* expression;
     vector<Statement*> blocks;
+    auto print(int) -> void;
 };
 
-struct Break : Statement {};
-struct Continue : Statement {};
+struct Break : Statement {
+    auto print(int) -> void;
+};
+struct Continue : Statement {
+    auto print(int) -> void;
+};
 
 struct If : Statement {
     vector<Expression*> conditions;
 	vector<vector<Statement*>> blocks; // if, elif, else 각각의 블록
     vector<Statement*> elseBlock;
+    auto print(int) -> void;
 };
 
 struct Print : Statement {
     vector<Expression*> arguments;
+    auto print(int) -> void;
 };
 
 struct ExpressionStatement : Statement {
     Expression* expression;
+    auto print(int) -> void;
 };
 
 struct Or : Expression {
     Expression* lhs;
     Expression* rhs;
+    auto print(int) -> void;
 };
 
 struct And : Expression {
     Expression* lhs;
     Expression* rhs;
+    auto print(int) -> void;
 };
 
 struct Relational : Expression {
     Kind kind;
     Expression* lhs;
     Expression* rhs;
+    auto print(int) -> void;
 };
 
 struct Arithmetic : Expression {
     Kind kind;
     Expression* lhs;
     Expression* rhs;
+    auto print(int) -> void;
 };
 
 struct Unary : Expression {
     Kind kind;
     Expression* sub;
+    auto print(int) -> void;
 };
 
 struct Call : Expression {
     Expression* sub;
-    vector<Expression*> arguments;
+    vector<Expression*> parameters;
+    auto print(int) -> void;
 };
 
 // 배열, map 원소의 참조
@@ -90,6 +113,7 @@ struct Call : Expression {
 struct GetElement : Expression {
     Expression* sub;
     Expression* index;
+    auto print(int) -> void;
 };
 
 // arr[0] = 3;
@@ -98,33 +122,43 @@ struct SetElement : Expression {
     Expression* sub;
     Expression* index;
     Expression* value;
+    auto print(int) -> void;
 };
 
 // 변수 참조
 struct GetVariable : Expression {
     wstring name;
+    auto print(int) -> void;
 };
 
 // 변수 수정
 struct SetVariable : Expression {
     wstring name;
     Expression* value;
+    auto print(int) -> void;
 };
 
-struct NullLiteral : Expression {};
+struct NullLiteral : Expression {
+    auto print(int) -> void;
+};
 struct BooleanLiteral : Expression {
     bool value = false;
+    auto print(int) -> void;
 };
 struct NumberLiteral : Expression {
     double value = 0.0;
+    auto print(int) -> void;
 };
 struct StringLiteral : Expression {
     wstring value;
+    auto print(int) -> void;
 };
 struct ArrayLiteral : Expression {
     vector<Expression*> values;
+    auto print(int) -> void;
 };
 struct MapLiteral : Expression {
     map<wstring, Expression*> values;
+    auto print(int) -> void;
 };
 #endif //KORLANG_NODE_H

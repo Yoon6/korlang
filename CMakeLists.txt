@@ -10,4 +10,4 @@ add_executable(Korlang main.cpp
         Scanner.cpp
         Node.h
         Parser.cpp
-)
+ "Printer.cpp")
