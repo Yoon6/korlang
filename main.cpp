@@ -1,14 +1,19 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <tuple>
 
 #include "Token.h"
 #include "Node.h"
+#include "Code.h"
 
 vector<Token> scan(string sourceCode);
 Program* parse(vector<Token> tokenList);
+tuple<vector<Code>, map<string, size_t>> generate(Program* syntaxTree);
+
 auto printTokenList(vector<Token>) -> void;
 auto printSyntaxTree(Program*) -> void;
+auto printObjectCode(tuple<vector<Code>, map<string, size_t>>) -> void;
 
 int main() {
     string sourceCode = R"(
@@ -22,8 +27,11 @@ int main() {
 
     vector<Token> tokenList = scan(sourceCode);
 	Program* syntaxTree = parse(tokenList);
+	auto objectCode = generate(syntaxTree);
+    printObjectCode(objectCode);
 
-    printSyntaxTree(syntaxTree);
+
+    //printSyntaxTree(syntaxTree);
     //printTokenList(tokenList);
 
     return 0;
