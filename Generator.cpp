@@ -127,8 +127,26 @@ auto MapLiteral::generate() -> void {
     // TODO: Implement MapLiteral generation logic
 }
 
-auto generate(Program* program) -> tuple<vector<Code>, map<string, size_t>>
+static vector<Code> codeList;
+
+auto writeCode(Instruction instruction) -> size_t {
+
+    codeList.push_back({ instruction });
+    return codeList.size() - 1;
+
+}
+
+auto writeCode(Instruction instruction, any operand) -> size_t {
+
+    codeList.push_back({ instruction });
+    return codeList.size() - 1;
+
+}
+
+auto generate(Program* program) -> tuple<vector<Code>, map<wstring, size_t>>
 {
+    wstring main = L"시작";
+    writeCode(Instruction::GetGlobal, main);
 
 
 }

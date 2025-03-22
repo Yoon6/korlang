@@ -9,11 +9,11 @@
 
 vector<Token> scan(string sourceCode);
 Program* parse(vector<Token> tokenList);
-tuple<vector<Code>, map<string, size_t>> generate(Program* syntaxTree);
+tuple<vector<Code>, map<wstring, size_t>> generate(Program* syntaxTree);
 
 auto printTokenList(vector<Token>) -> void;
 auto printSyntaxTree(Program*) -> void;
-auto printObjectCode(tuple<vector<Code>, map<string, size_t>>) -> void;
+auto printObjectCode(tuple<vector<Code>, map<wstring, size_t>>) -> void;
 
 int main() {
     string sourceCode = R"(
