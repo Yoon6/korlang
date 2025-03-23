@@ -1,9 +1,15 @@
 #include <tuple>
+#include <list>
+
 #include "Node.h"
 #include "Code.h"
 
 static vector<Code> codeList;
 static map<wstring, size_t> functionTable;
+
+static list<map<wstring, size_t>> symbolStack;
+static vector<size_t> offsetStack;
+static size_t localSize = 0;
 
 auto writeCode(Instruction instruction) -> size_t {
 
@@ -34,16 +40,43 @@ auto generate(Program* program) -> tuple<vector<Code>, map<wstring, size_t>>
     return {codeList, functionTable};
 }
 
+auto patchAddress(size_t codeIndex) -> void 
+{
+	codeList[codeIndex].operand = codeList.size();
+}
+
+auto patchOperand(size_t codeIndex, size_t operand) -> void
+{
+	codeList[codeIndex].operand = operand;
+}
+
+auto initBlock() -> void
+{
+    localSize = 0;
+	offsetStack.push_back(0);
+    symbolStack.emplace_front();
+}
+
+auto popBlock() -> void
+{
+	offsetStack.pop_back();
+	symbolStack.pop_front();
+}
+
 // Function
 auto Function::generate() -> void {
     functionTable[name] = codeList.size();
 
+    auto temp = writeCode(Instruction::Alloca);
+    initBlock();
     for (auto& node : blocks)
     {
         node->generate();
     }
-    writeCode(Instruction::Return);
+    popBlock();
+    patchOperand(temp, localSize);
 
+    writeCode(Instruction::Return);
 }
 
 // Return
@@ -51,9 +84,31 @@ auto Return::generate() -> void {
     // TODO: Implement Return generation logic
 }
 
+auto setLocal(wstring name) -> void
+{
+    symbolStack.front()[name] = offsetStack.back();
+    offsetStack.back() += 1;
+	localSize = max(localSize, offsetStack.back());
+}
+
+auto getLocal(wstring name) -> size_t
+{
+	for (auto& symbolTable : symbolStack)
+	{
+        if (symbolTable.count(name))
+        {
+            return symbolTable[name];
+        }
+	}
+	return SIZE_MAX;
+}
+
 // Variable
 auto Variable::generate() -> void {
-    // TODO: Implement Variable generation logic
+    setLocal(name);
+    expression->generate();
+	writeCode(Instruction::SetLocal, getLocal(name));
+    writeCode(Instruction::PopOperand);
 }
 
 // For
@@ -96,7 +151,7 @@ auto Or::generate() -> void {
     lhs->generate();
     auto LogicalOr = writeCode(Instruction::LogicalOr);
     rhs->generate();
-//    patchAddress(LogicalOr);
+    patchAddress(LogicalOr);
 }
 
 // And
