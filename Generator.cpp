@@ -2,9 +2,48 @@
 #include "Node.h"
 #include "Code.h"
 
+static vector<Code> codeList;
+static map<wstring, size_t> functionTable;
+
+auto writeCode(Instruction instruction) -> size_t {
+
+    codeList.push_back({ instruction });
+    return codeList.size() - 1;
+
+}
+
+auto writeCode(Instruction instruction, any operand) -> size_t {
+
+    codeList.push_back({ instruction, operand });
+    return codeList.size() - 1;
+
+}
+
+auto generate(Program* program) -> tuple<vector<Code>, map<wstring, size_t>>
+{
+    wstring main = L"시작";
+    writeCode(Instruction::GetGlobal, main);
+    writeCode(Instruction::Call, static_cast<size_t>(0));
+    writeCode(Instruction::Exit);
+
+    for (auto& node : program->functions)
+    {
+        node->generate();
+    }
+
+    return {codeList, functionTable};
+}
+
 // Function
 auto Function::generate() -> void {
-    // TODO: Implement Function generation logic
+    functionTable[name] = codeList.size();
+
+    for (auto& node : blocks)
+    {
+        node->generate();
+    }
+    writeCode(Instruction::Return);
+
 }
 
 // Return
@@ -39,17 +78,25 @@ auto If::generate() -> void {
 
 // Print
 auto Print::generate() -> void {
-    // TODO: Implement Print generation logic
+    for (int i = arguments.size(); i >= 0; i--)
+    {
+        arguments[i - 1]->generate();
+    }
+    writeCode(Instruction::Print, arguments.size());
 }
 
 // ExpressionStatement
 auto ExpressionStatement::generate() -> void {
-    // TODO: Implement ExpressionStatement generation logic
+    expression->generate();
+    writeCode(Instruction::PopOperand);
 }
 
 // Or
 auto Or::generate() -> void {
-    // TODO: Implement Or generation logic
+    lhs->generate();
+    auto LogicalOr = writeCode(Instruction::LogicalOr);
+    rhs->generate();
+//    patchAddress(LogicalOr);
 }
 
 // And
@@ -64,7 +111,17 @@ auto Relational::generate() -> void {
 
 // Arithmetic
 auto Arithmetic::generate() -> void {
-    // TODO: Implement Arithmetic generation logic
+    map<Kind, Instruction> instructions = {
+            {Kind::Add, Instruction::Add},
+            {Kind::Subtract, Instruction::Subtract},
+            {Kind::Multiply, Instruction::Multiply},
+            {Kind::Divide, Instruction::Divide},
+            {Kind::Modulo, Instruction::Modulo}
+    };
+
+    lhs->generate();
+    rhs->generate();
+    writeCode(instructions[kind]);
 }
 
 // Unary
@@ -109,12 +166,12 @@ auto BooleanLiteral::generate() -> void {
 
 // NumberLiteral
 auto NumberLiteral::generate() -> void {
-    // TODO: Implement NumberLiteral generation logic
+    writeCode(Instruction::PushNumber, value);
 }
 
 // StringLiteral
 auto StringLiteral::generate() -> void {
-    // TODO: Implement StringLiteral generation logic
+    writeCode(Instruction::PushString, value);
 }
 
 // ArrayLiteral
@@ -127,26 +184,4 @@ auto MapLiteral::generate() -> void {
     // TODO: Implement MapLiteral generation logic
 }
 
-static vector<Code> codeList;
 
-auto writeCode(Instruction instruction) -> size_t {
-
-    codeList.push_back({ instruction });
-    return codeList.size() - 1;
-
-}
-
-auto writeCode(Instruction instruction, any operand) -> size_t {
-
-    codeList.push_back({ instruction });
-    return codeList.size() - 1;
-
-}
-
-auto generate(Program* program) -> tuple<vector<Code>, map<wstring, size_t>>
-{
-    wstring main = L"시작";
-    writeCode(Instruction::GetGlobal, main);
-
-
-}

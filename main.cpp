@@ -18,17 +18,14 @@ auto printObjectCode(tuple<vector<Code>, map<wstring, size_t>>) -> void;
 int main() {
     string sourceCode = R"(
         함수 시작() {
-            출력("안녕");
-            출력("\n");
-            출력(1 + 2 * 3);
-            출력("\n");
+            1 + 2;
         }
     )";
 
     vector<Token> tokenList = scan(sourceCode);
 	Program* syntaxTree = parse(tokenList);
 	auto objectCode = generate(syntaxTree);
-    printObjectCode(objectCode);
+//    printObjectCode(objectCode);
 
 
     //printSyntaxTree(syntaxTree);

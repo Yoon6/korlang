@@ -11,4 +11,6 @@ add_executable(Korlang main.cpp
         Node.h
         Parser.cpp
         Printer.cpp 
-        Code.h "Generator.cpp")
+        Code.h
+        Generator.cpp
+)

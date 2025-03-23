@@ -67,6 +67,24 @@ build CMakeFiles/Korlang.dir/Scanner.cpp.o: CXX_COMPILER__Korlang_unscanned_Debu
   OBJECT_DIR = CMakeFiles/Korlang.dir
   OBJECT_FILE_DIR = CMakeFiles/Korlang.dir
 
+build CMakeFiles/Korlang.dir/Parser.cpp.o: CXX_COMPILER__Korlang_unscanned_Debug /Users/max/CLionProjects/kolang2/Parser.cpp || cmake_object_order_depends_target_Korlang
+  DEP_FILE = CMakeFiles/Korlang.dir/Parser.cpp.o.d
+  FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/Korlang.dir
+  OBJECT_FILE_DIR = CMakeFiles/Korlang.dir
+
+build CMakeFiles/Korlang.dir/Printer.cpp.o: CXX_COMPILER__Korlang_unscanned_Debug /Users/max/CLionProjects/kolang2/Printer.cpp || cmake_object_order_depends_target_Korlang
+  DEP_FILE = CMakeFiles/Korlang.dir/Printer.cpp.o.d
+  FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/Korlang.dir
+  OBJECT_FILE_DIR = CMakeFiles/Korlang.dir
+
+build CMakeFiles/Korlang.dir/Generator.cpp.o: CXX_COMPILER__Korlang_unscanned_Debug /Users/max/CLionProjects/kolang2/Generator.cpp || cmake_object_order_depends_target_Korlang
+  DEP_FILE = CMakeFiles/Korlang.dir/Generator.cpp.o.d
+  FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/Korlang.dir
+  OBJECT_FILE_DIR = CMakeFiles/Korlang.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Korlang
@@ -75,7 +93,7 @@ build CMakeFiles/Korlang.dir/Scanner.cpp.o: CXX_COMPILER__Korlang_unscanned_Debu
 #############################################
 # Link the executable Korlang
 
-build Korlang: CXX_EXECUTABLE_LINKER__Korlang_Debug CMakeFiles/Korlang.dir/main.cpp.o CMakeFiles/Korlang.dir/Kind.cpp.o CMakeFiles/Korlang.dir/Scanner.cpp.o
+build Korlang: CXX_EXECUTABLE_LINKER__Korlang_Debug CMakeFiles/Korlang.dir/main.cpp.o CMakeFiles/Korlang.dir/Kind.cpp.o CMakeFiles/Korlang.dir/Scanner.cpp.o CMakeFiles/Korlang.dir/Parser.cpp.o CMakeFiles/Korlang.dir/Printer.cpp.o CMakeFiles/Korlang.dir/Generator.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk
   OBJECT_DIR = CMakeFiles/Korlang.dir
   POST_BUILD = :
