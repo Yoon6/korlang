@@ -111,9 +111,32 @@ auto Variable::generate() -> void {
     writeCode(Instruction::PopOperand);
 }
 
+auto pushBlock() -> void
+{
+	symbolStack.emplace_front();
+	offsetStack.push_back(offsetStack.back());
+}
+
 // For
 auto For::generate() -> void {
-    // TODO: Implement For generation logic
+    pushBlock();
+    variable->generate();
+    auto jumpAddress = codeList.size();
+	condition->generate();
+
+    auto conditionJump = writeCode(Instruction::ConditionJump);
+
+    // 참인 경우에 실행할 코드
+    for (auto& node : blocks)
+    {
+		node->generate();
+    }
+
+	expression->generate();
+	writeCode(Instruction::PopOperand);
+	writeCode(Instruction::Jump, jumpAddress);
+	patchAddress(conditionJump);
+	popBlock();
 }
 
 // Break
@@ -201,12 +224,27 @@ auto SetElement::generate() -> void {
 
 // GetVariable
 auto GetVariable::generate() -> void {
-    // TODO: Implement GetVariable generation logic
+	if (getLocal(name) != SIZE_MAX)
+	{
+		writeCode(Instruction::GetLocal, getLocal(name));
+	}
+	else
+	{
+		writeCode(Instruction::GetGlobal, name);
+	}
 }
 
 // SetVariable
 auto SetVariable::generate() -> void {
-    // TODO: Implement SetVariable generation logic
+    value->generate();
+    if (getLocal(name) != SIZE_MAX)
+    {
+		writeCode(Instruction::SetLocal, getLocal(name));
+    }
+    else
+    {
+        writeCode(Instruction::SetGlobal, name);
+    }
 }
 
 // NullLiteral
