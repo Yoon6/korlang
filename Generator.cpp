@@ -11,6 +11,8 @@ static list<map<wstring, size_t>> symbolStack;
 static vector<size_t> offsetStack;
 static size_t localSize = 0;
 
+static vector<vector<size_t>> continueStack;
+
 auto writeCode(Instruction instruction) -> size_t {
 
     codeList.push_back({ instruction });
@@ -69,6 +71,11 @@ auto Function::generate() -> void {
 
     auto temp = writeCode(Instruction::Alloca);
     initBlock();
+    for (auto& name : parameters)
+    {
+		setLocal(name);
+    }
+
     for (auto& node : blocks)
     {
         node->generate();
@@ -81,7 +88,8 @@ auto Function::generate() -> void {
 
 // Return
 auto Return::generate() -> void {
-    // TODO: Implement Return generation logic
+    expression->generate();
+	writeCode(Instruction::Return);
 }
 
 auto setLocal(wstring name) -> void
@@ -119,6 +127,7 @@ auto pushBlock() -> void
 
 // For
 auto For::generate() -> void {
+    continueStack.emplace_back();
     pushBlock();
     variable->generate();
     auto jumpAddress = codeList.size();
@@ -132,11 +141,18 @@ auto For::generate() -> void {
 		node->generate();
     }
 
+    auto continueAddress = codeList.size(); // 증감식 주소
 	expression->generate();
 	writeCode(Instruction::PopOperand);
 	writeCode(Instruction::Jump, jumpAddress);
 	patchAddress(conditionJump);
 	popBlock();
+
+    for (auto& jump : continueStack.back())
+    {
+		patchOperand(jump, continueAddress);
+    }
+    continueStack.pop_back();
 }
 
 // Break
@@ -146,12 +162,46 @@ auto Break::generate() -> void {
 
 // Continue
 auto Continue::generate() -> void {
-    // TODO: Implement Continue generation logic
+    if (continueStack.empty())
+    {
+        return;
+    }
+
+    auto jumpCode = writeCode(Instruction::Jump);
+	continueStack.back().push_back(jumpCode);
 }
 
 // If
 auto If::generate() -> void {
-    // TODO: Implement If generation logic
+    vector<size_t> jumpList;
+    for (int i = 0; i < conditions.size(); i++)
+    {
+        conditions[i]->generate();
+		auto conditionJump = writeCode(Instruction::ConditionJump);
+        pushBlock();
+		for (auto& node : blocks[i])
+		{
+			node->generate();
+		}
+        popBlock();
+        jumpList.push_back(writeCode(Instruction::Jump));
+		patchAddress(conditionJump);
+
+    }
+    if (!elseBlock.empty())
+    {
+        pushBlock();
+        for (auto& node : elseBlock)
+        {
+            node->generate();
+        }
+        popBlock();
+    }
+
+	for (auto& jump : jumpList)
+	{
+		patchAddress(jump);
+	}
 }
 
 // Print
@@ -209,17 +259,28 @@ auto Unary::generate() -> void {
 
 // Call
 auto Call::generate() -> void {
-    // TODO: Implement Call generation logic
+	for (auto i = parameters.size(); i > 0; i--)
+	{
+		parameters[i - 1]->generate();
+	}
+	sub->generate();
+	writeCode(Instruction::Call, parameters.size());
+
 }
 
 // GetElement
 auto GetElement::generate() -> void {
-    // TODO: Implement GetElement generation logic
+	sub->generate();
+	index->generate();
+	writeCode(Instruction::GetElement);
 }
 
 // SetElement
 auto SetElement::generate() -> void {
-    // TODO: Implement SetElement generation logic
+    value->generate();
+    sub->generate();
+	index->generate();
+	writeCode(Instruction::SetElement);
 }
 
 // GetVariable
@@ -269,7 +330,11 @@ auto StringLiteral::generate() -> void {
 
 // ArrayLiteral
 auto ArrayLiteral::generate() -> void {
-    // TODO: Implement ArrayLiteral generation logic
+    for (int i = values.size(); i > 0; i--)
+    {
+		values[i - 1]->generate();
+    }
+	writeCode(Instruction::PushArray, values.size());
 }
 
 // MapLiteral
