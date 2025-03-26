@@ -12,6 +12,7 @@ static vector<size_t> offsetStack;
 static size_t localSize = 0;
 
 static vector<vector<size_t>> continueStack;
+static vector<vector<size_t>> breakStack;
 
 auto writeCode(Instruction instruction) -> size_t {
 
@@ -65,6 +66,25 @@ auto popBlock() -> void
 	symbolStack.pop_front();
 }
 
+auto setLocal(wstring name) -> void
+{
+    symbolStack.front()[name] = offsetStack.back();
+    offsetStack.back() += 1;
+	localSize = max(localSize, offsetStack.back());
+}
+
+auto getLocal(wstring name) -> size_t
+{
+	for (auto& symbolTable : symbolStack)
+	{
+        if (symbolTable.count(name))
+        {
+            return symbolTable[name];
+        }
+	}
+	return SIZE_MAX;
+}
+
 // Function
 auto Function::generate() -> void {
     functionTable[name] = codeList.size();
@@ -92,25 +112,6 @@ auto Return::generate() -> void {
 	writeCode(Instruction::Return);
 }
 
-auto setLocal(wstring name) -> void
-{
-    symbolStack.front()[name] = offsetStack.back();
-    offsetStack.back() += 1;
-	localSize = max(localSize, offsetStack.back());
-}
-
-auto getLocal(wstring name) -> size_t
-{
-	for (auto& symbolTable : symbolStack)
-	{
-        if (symbolTable.count(name))
-        {
-            return symbolTable[name];
-        }
-	}
-	return SIZE_MAX;
-}
-
 // Variable
 auto Variable::generate() -> void {
     setLocal(name);
@@ -128,6 +129,7 @@ auto pushBlock() -> void
 // For
 auto For::generate() -> void {
     continueStack.emplace_back();
+    breakStack.emplace_back();
     pushBlock();
     variable->generate();
     auto jumpAddress = codeList.size();
@@ -152,12 +154,23 @@ auto For::generate() -> void {
     {
 		patchOperand(jump, continueAddress);
     }
+    for (auto& jump : breakStack.back())
+    {
+		patchAddress(jump);
+    }
     continueStack.pop_back();
+	breakStack.pop_back();
 }
 
 // Break
 auto Break::generate() -> void {
-    // TODO: Implement Break generation logic
+	if (breakStack.empty())
+	{
+		return;
+	}
+
+    auto jumpCode = writeCode(Instruction::Jump);
+	breakStack.back().push_back(jumpCode);
 }
 
 // Continue
@@ -229,12 +242,26 @@ auto Or::generate() -> void {
 
 // And
 auto And::generate() -> void {
-    // TODO: Implement And generation logic
+	lhs->generate();
+	auto LogicalAnd = writeCode(Instruction::LogicalAnd);
+	rhs->generate();
+	patchAddress(LogicalAnd);
 }
 
 // Relational
 auto Relational::generate() -> void {
-    // TODO: Implement Relational generation logic
+	map<Kind, Instruction> instructions = {
+			{Kind::Equal, Instruction::Equal},
+			{Kind::NotEqual, Instruction::NotEqual},
+			{Kind::LessThan, Instruction::LessThan},
+			{Kind::LessOrEqual, Instruction::LessOrEqual},
+			{Kind::GreaterThan, Instruction::GreaterThan},
+			{Kind::GreaterOrEqual, Instruction::GreaterOrEqual}
+	};
+
+    lhs->generate();
+    rhs->generate();
+    writeCode(instructions[kind]);
 }
 
 // Arithmetic
@@ -254,7 +281,13 @@ auto Arithmetic::generate() -> void {
 
 // Unary
 auto Unary::generate() -> void {
-    // TODO: Implement Unary generation logic
+    map<Kind, Instruction> instructions = {
+        {Kind::Add, Instruction::Absolute},
+        {Kind::Subtract, Instruction::ReverseSign},
+    };
+
+    sub->generate();
+    writeCode(instructions[kind]);
 }
 
 // Call
@@ -310,12 +343,12 @@ auto SetVariable::generate() -> void {
 
 // NullLiteral
 auto NullLiteral::generate() -> void {
-    // TODO: Implement NullLiteral generation logic
+    writeCode(Instruction::PushNull);
 }
 
 // BooleanLiteral
 auto BooleanLiteral::generate() -> void {
-    // TODO: Implement BooleanLiteral generation logic
+    writeCode(Instruction::PushBoolean, value);
 }
 
 // NumberLiteral
@@ -339,7 +372,13 @@ auto ArrayLiteral::generate() -> void {
 
 // MapLiteral
 auto MapLiteral::generate() -> void {
-    // TODO: Implement MapLiteral generation logic
+    for (auto& [key, value] : values)
+    {
+        writeCode(Instruction::PushString, key);
+		value->generate();
+    }
+
+    writeCode(Instruction::PushMap, values.size());
 }
 
 
