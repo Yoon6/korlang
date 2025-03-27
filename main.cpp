@@ -10,6 +10,7 @@
 vector<Token> scan(string sourceCode);
 Program* parse(vector<Token> tokenList);
 tuple<vector<Code>, map<wstring, size_t>> generate(Program* syntaxTree);
+void execute(vector<Code> codeList, map<wstring, size_t> functionTables);
 
 auto printTokenList(vector<Token>) -> void;
 auto printSyntaxTree(Program*) -> void;
@@ -25,11 +26,7 @@ int main() {
     vector<Token> tokenList = scan(sourceCode);
 	Program* syntaxTree = parse(tokenList);
 	auto objectCode = generate(syntaxTree);
-//    printObjectCode(objectCode);
-
-
-    //printSyntaxTree(syntaxTree);
-    //printTokenList(tokenList);
+    execute(get<0>(objectCode), get<1>(objectCode));
 
     return 0;
 }

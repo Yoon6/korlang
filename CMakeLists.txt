@@ -13,4 +13,5 @@ add_executable(Korlang main.cpp
         Printer.cpp 
         Code.h
         Generator.cpp
+        Machine.cpp
 )
