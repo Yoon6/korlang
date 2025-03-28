@@ -19,7 +19,15 @@ auto printObjectCode(tuple<vector<Code>, map<wstring, size_t>>) -> void;
 int main() {
     string sourceCode = R"(
         함수 시작() {
-            1 + 2;
+            출력(1 + 2);
+            출력(팩토리얼(3));
+        }
+
+        함수 팩토리얼(n) {
+            만약 (n < 2) {
+                반환 1;
+            }
+            반환 n * 팩토리얼(n-1);
         }
     )";
 

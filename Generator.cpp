@@ -219,7 +219,7 @@ auto If::generate() -> void {
 
 // Print
 auto Print::generate() -> void {
-    for (int i = arguments.size(); i >= 0; i--)
+    for (int i = arguments.size(); i > 0; i--)
     {
         arguments[i - 1]->generate();
     }
