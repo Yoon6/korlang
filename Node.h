@@ -69,6 +69,7 @@ struct If : Statement {
 };
 
 struct Print : Statement {
+    bool isPrintLine;
     vector<Expression*> arguments;
     auto print(int) -> void;
     auto generate() -> void;

@@ -149,6 +149,10 @@ void execute(vector<Code> codeList, map<wstring, size_t> functionTables) {
                 }
                 break;
             }
+            case Instruction::PrintLine: {
+                cout << '\n';
+                break;
+            }
             case Instruction::LogicalOr: {
                 auto value = popOperand();
                 if (isTrue(value)) {

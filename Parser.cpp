@@ -470,7 +470,15 @@ Print* parsePrint()
 {
 	auto result = new Print();
 	// skip '출력'
-	skipCurrent(Kind::Print);
+    if (skipCurrentIf(Kind::PrintLine))
+    {
+        result->isPrintLine = true;
+    }
+    else
+    {
+        skipCurrent(Kind::Print);
+        result->isPrintLine = false;
+    }
 	// skip (
 	skipCurrent(Kind::LeftParen);
 
@@ -554,6 +562,7 @@ vector<Statement*> parseBlock()
 			result.push_back(parseIf());
 			break;
 		case Kind::Print:
+        case Kind::PrintLine:
 			result.push_back(parsePrint());
 			break;
 		case Kind::Return:

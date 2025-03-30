@@ -23,7 +23,7 @@ enum class Kind {
     Variable,
     For, Break, Continue,
     If, Elif, Else,
-    Print,
+    Print, PrintLine,
 
     LogicalAnd, LogicalOr,
     Assignment,

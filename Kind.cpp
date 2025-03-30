@@ -25,6 +25,7 @@ static map<wstring, Kind> stringToKind = {
         {L"그게아니라",    Kind::Elif},
         {L"아니면",      Kind::Else},
         {L"출력",       Kind::Print},
+        {L"출력줄바꿈",  Kind::PrintLine},
 
         {L"그리고",      Kind::LogicalAnd},
         {L"또는",       Kind::LogicalOr},

@@ -224,6 +224,10 @@ auto Print::generate() -> void {
         arguments[i - 1]->generate();
     }
     writeCode(Instruction::Print, arguments.size());
+    if (isPrintLine)
+    {
+        writeCode(Instruction::PrintLine);
+    }
 }
 
 // ExpressionStatement

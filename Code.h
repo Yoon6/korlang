@@ -6,7 +6,7 @@ enum class Instruction
 	Exit,
 	Call, Alloca, Return,
 	Jump, ConditionJump,
-	Print,
+	Print, PrintLine,
 
 	LogicalOr, LogicalAnd,
 	Add, Subtract,
