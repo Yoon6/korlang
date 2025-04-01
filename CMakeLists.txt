@@ -16,5 +16,5 @@ add_executable(Korlang main.cpp
         Machine.cpp
         DataType.cpp
         DataType.h
-        BuildinFunctionTable.cpp
+        BuiltinFunctionTable.cpp
 )
