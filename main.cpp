@@ -12,22 +12,22 @@ Program* parse(vector<Token> tokenList);
 tuple<vector<Code>, map<wstring, size_t>> generate(Program* syntaxTree);
 void execute(vector<Code> codeList, map<wstring, size_t> functionTables);
 
-auto printTokenList(vector<Token>) -> void;
-auto printSyntaxTree(Program*) -> void;
-auto printObjectCode(tuple<vector<Code>, map<wstring, size_t>>) -> void;
+// auto printTokenList(vector<Token>) -> void;
+// auto printSyntaxTree(Program*) -> void;
+// auto printObjectCode(tuple<vector<Code>, map<wstring, size_t>>) -> void;
 
 int main() {
     string sourceCode = R"(
         함수 시작() {
-            출력줄바꿈(1 + 2);
-            출력(팩토리얼(3));
+            출력줄바꿈(11 + 2);
+            출력(팩토리얼(5));
         }
 
-        함수 팩토리얼(n) {
-            만약 (n < 2) {
+        함수 팩토리얼(숫자) {
+            만약 (숫자 < 2) {
                 반환 1;
             }
-            반환 n * 팩토리얼(n-1);
+            반환 숫자 * 팩토리얼(숫자 - 1);
         }
     )";
 
@@ -39,12 +39,12 @@ int main() {
     return 0;
 }
 
-auto printTokenList(vector<Token> tokenList) -> void {
-    cout << setw(12) << left << "KIND" << "STRING" << endl;
-    cout << string(23, '-') << endl;
-    for (auto &token: tokenList)
-        cout << token << endl;
-}
+// auto printTokenList(vector<Token> tokenList) -> void {
+//     cout << setw(12) << left << "KIND" << "STRING" << endl;
+//     cout << string(23, '-') << endl;
+//     for (auto &token: tokenList)
+//         cout << token << endl;
+// }
 
 auto operator<<(ostream &stream, Token &token) -> ostream & {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

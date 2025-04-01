@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Korlang 컴파일러</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    textarea {
+      width: 100%;
+      max-width: 600px;
+      height: 200px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 600px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Korlang 컴파일러</h1>
+  <p>코드를 입력하고 컴파일 버튼을 클릭하세요.</p>
+  
+  <textarea id="code" placeholder="여기에 코드를 입력하세요"></textarea>
+  <br><br>
+  <button id="compile">컴파일</button>
+  
+  <h2>결과:</h2>
+  <pre id="result">여기에 결과가 표시됩니다.</pre>
+  
+  <script>
+    document.getElementById('compile').addEventListener('click', function() {
+      const code = document.getElementById('code').value;
+      
+      // 여기에 실제 Korlang 컴파일 API 호출 코드를 추가하면 됩니다.
+      // 예를 들어, fetch() 함수를 사용하여 서버에 코드를 전송하고 결과를 받아올 수 있습니다.
+      
+      // 임시 동작: 입력한 코드를 결과 영역에 그대로 출력
+      document.getElementById('result').textContent = "컴파일 결과:\n" + code;
+    });
+  </script>
+</body>
+</html>
