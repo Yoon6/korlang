@@ -16,7 +16,7 @@ enum class CharType {
     OperatorAndPunctuator
 };
 
-bool isHangul(wchar_t wc) {
+bool isKorean(wchar_t wc) {
     return (wc >= 0xAC00 && wc <= 0xD7A3);
 }
 
@@ -30,7 +30,7 @@ CharType getCharType(wchar_t c) {
     if (c == '\"') {
         return CharType::StringLiteral;
     }
-    if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || isHangul(c)) {
+    if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || isKorean(c)) {
         return CharType::IdentifierAndKeyword;
     }
     if ('!' <= c && c <= '/' ||
@@ -47,9 +47,9 @@ bool isCharType(wchar_t wc, CharType type) {
         case CharType::NumberLiteral:
             return '0' <= wc && wc <= '9';
         case CharType::StringLiteral:
-            return (33 <= wc && wc <= 126 && wc != '\"') || isHangul(wc);
+            return (33 <= wc && wc <= 126 && wc != '\"') || isKorean(wc);
         case CharType::IdentifierAndKeyword:
-            return '0' <= wc && wc <= '9' || 'a' <= wc && wc <= 'z' || 'A' <= wc && wc <= 'Z' || isHangul(wc);
+            return '0' <= wc && wc <= '9' || 'a' <= wc && wc <= 'z' || 'A' <= wc && wc <= 'Z' || isKorean(wc);
         case CharType::OperatorAndPunctuator:
             return '!' <= wc && wc <= '/' || ':' <= wc && wc <= '@' || '[' <= wc && wc <= '`' || '{' <= wc && wc <= '~';
         default:
