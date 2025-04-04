@@ -12,21 +12,20 @@ Program* parse(vector<Token> tokenList);
 tuple<vector<Code>, map<wstring, size_t>> generate(Program* syntaxTree);
 void execute(vector<Code> codeList, map<wstring, size_t> functionTables);
 
-auto printTokenList(vector<Token>) -> void;
+// auto printTokenList(vector<Token>) -> void;
 // auto printSyntaxTree(Program*) -> void;
 // auto printObjectCode(tuple<vector<Code>, map<wstring, size_t>>) -> void;
-extern "C" void run(string sourceCode)
+void run(string sourceCode)
 {
-    printf("Run\n");
-    printf("Scan\n");
     vector<Token> tokenList = scan(sourceCode);
-    printTokenList(tokenList);
-    printf("Parse\n");
 	Program* syntaxTree = parse(tokenList);
-    printf("Generate\n");
 	auto objectCode = generate(syntaxTree);
-    printf("Execute\n");
     execute(get<0>(objectCode), get<1>(objectCode));
+}
+
+extern "C" void run_wrapper(const char* sourceCode)
+{
+    run(std::string(sourceCode));
 }
 
 
@@ -51,12 +50,12 @@ int main() {
     return 0;
 }
 
-auto printTokenList(vector<Token> tokenList) -> void {
-    cout << setw(12) << left << "KIND" << "STRING" << endl;
-    cout << string(23, '-') << endl;
-    for (auto &token: tokenList)
-        cout << token << endl;
-}
+// auto printTokenList(vector<Token> tokenList) -> void {
+//     cout << setw(12) << left << "KIND" << "STRING" << endl;
+//     cout << string(23, '-') << endl;
+//     for (auto &token: tokenList)
+//         cout << token << endl;
+// }
 
 auto operator<<(ostream &stream, Token &token) -> ostream & {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

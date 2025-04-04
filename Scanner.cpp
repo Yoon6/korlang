@@ -120,20 +120,13 @@ Token scanOperatorAndPunctuator() {
 vector<Token> scan(string sourceCode) {
     vector<Token> result;
     sourceCode += '\0'; // Add null character
-    printf("Scan - wstring converting\n");
-    cout << sourceCode << endl;
 
     wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wSourceCode = converter.from_bytes(sourceCode);
 
-    printf("Scan - wstring converted\n");
-    cout << converter.to_bytes(wSourceCode) << endl;
-
     current = wSourceCode.begin();
 
     while (*current != '\0') {
-        printf("while");
-
         switch (getCharType(*current)) {
             case CharType::WhiteSpace:
                 current += 1;
@@ -156,7 +149,6 @@ vector<Token> scan(string sourceCode) {
         }
     }
 
-    printf("Scan - end\n");
     result.push_back({Kind::EndOfLine});
     return result;
 }

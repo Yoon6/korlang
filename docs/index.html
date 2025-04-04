@@ -71,7 +71,7 @@
   <div class="container">
     <!-- 왼쪽: 텍스트 입력창 -->
     <div class="left-panel">
-      <textarea id="inputText" placeholder="코드를 입력하세요..."></textarea>
+      <textarea id="inputText" placeholder="소스 코드를 입력하세요..."></textarea>
     </div>
     <!-- 오른쪽: 실행 버튼과 출력창 -->
     <div class="right-panel">
@@ -82,15 +82,14 @@
     </div>
   </div>
 
-  <!-- Emscripten 설정 -->
+  <!-- Emscripten Module 전역 객체 정의 -->
   <script>
-    // Module 객체를 통해 Emscripten 런타임 및 출력 처리를 설정합니다.
-    var Module = {
-      // onRuntimeInitialized는 Emscripten이 완전히 초기화되었을 때 호출됩니다.
+    window.Module = {
       onRuntimeInitialized: function() {
         console.log("WASM 모듈 로드 완료");
+        // cwrap을 사용해 run_wrapper 함수를 JS 함수로 래핑 (반환값은 없으므로 null, 매개변수는 string)
+        window.runFunc = Module.cwrap('run_wrapper', null, ['string']);
       },
-      // Emscripten의 print 함수를 재정의하여 stdout을 출력창에 표시합니다.
       print: function(text) {
         var outputElem = document.getElementById("output");
         outputElem.innerText += text + "\n";
@@ -100,7 +99,7 @@
       }
     };
   </script>
-  <!-- Emscripten이 생성한 JS glue 코드 (index.js)를 로드합니다. -->
+  <!-- Emscripten이 생성한 JS glue 코드 (index.js)를 로드 -->
   <script src="index.js"></script>
 
   <!-- 실행 버튼 클릭 처리 -->
@@ -108,17 +107,14 @@
     document.getElementById('runButton').addEventListener('click', function() {
       // 출력창 초기화
       document.getElementById('output').innerText = '';
-      // 필요 시, 왼쪽 입력창의 코드를 Module에 전달하는 로직 추가 가능
-      // 예: var code = document.getElementById('inputText').value;
+      // 인풋 텍스트에서 소스 코드 문자열을 가져옴
       var code = document.getElementById('inputText').value;
-
-      // 내보낸 함수가 "run" 이름으로 존재하는지 확인 후 호출
-      if (Module._run) {
-        Module._run(code);
-      } else if (Module.run) {
-        Module.run(code);
+      console.log("전달할 코드:", code);
+      // 래핑된 run_wrapper 함수 호출
+      if (window.runFunc) {
+        window.runFunc(code);
       } else {
-        console.error("run 함수가 내보내지지 않았습니다.");
+        console.error("WASM 모듈이 아직 초기화되지 않았습니다.");
       }
     });
   </script>
