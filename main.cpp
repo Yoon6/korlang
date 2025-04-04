@@ -21,6 +21,7 @@ void run(string sourceCode)
 	Program* syntaxTree = parse(tokenList);
 	auto objectCode = generate(syntaxTree);
     execute(get<0>(objectCode), get<1>(objectCode));
+    cout << flush;
 }
 
 extern "C" void run_wrapper(const char* sourceCode)

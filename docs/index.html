@@ -104,9 +104,22 @@
 
   <!-- 실행 버튼 클릭 처리 -->
   <script>
+    document.getElementById('inputText').value = `함수 시작() {
+    출력줄바꿈(11 + 2);
+    출력줄바꿈("Hello");
+    출력줄바꿈(팩토리얼(3));
+}
+
+함수 팩토리얼(수) {
+  만약 (수 < 2) {
+    반환 1;
+  }
+  반환 수 * 팩토리얼(수 - 1);
+}
+`;
     document.getElementById('runButton').addEventListener('click', function() {
       // 출력창 초기화
-      document.getElementById('output').innerText = '';
+      document.getElementById('output').innerText = "";
       // 인풋 텍스트에서 소스 코드 문자열을 가져옴
       var code = document.getElementById('inputText').value;
       console.log("전달할 코드:", code);
