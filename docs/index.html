@@ -1,191 +1,126 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>korlang 컴파일러</title>
+  <title>Korlang Compiler</title>
   <style>
     /* 기본 스타일 */
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
     }
-
+    /* 레이아웃 컨테이너 */
     .container {
       display: flex;
       height: 100vh;
     }
-
-    .input-pane,
-    .output-pane {
+    /* 왼쪽 패널: 텍스트 입력창 */
+    .left-panel {
       flex: 1;
       padding: 20px;
-      box-sizing: border-box;
-      background: #fff;
-      overflow: auto;
+      background-color: #fff;
+      border-right: 1px solid #ccc;
     }
-
-    .input-pane {
-      border-right: 1px solid #ddd;
+    /* 오른쪽 패널: 실행 버튼과 출력창 */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-
-    textarea {
-      width: 100%;
-      height: calc(100% - 40px);
-      resize: none;
-      font-size: 16px;
-      padding: 10px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .output-pane {
-      position: relative;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 4px;
-      background: #f8f8f8;
-      height: calc(100% - 60px);
-      overflow-y: auto;
-      margin-top: 50px;
-    }
-
-    .build-button {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+    /* 오른쪽 상단 헤더: 실행 버튼 배치 */
+    .header {
+      background-color: #fff;
       padding: 10px 20px;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .run-button {
+      padding: 8px 16px;
       font-size: 16px;
-      background: #007bff;
-      color: #fff;
       border: none;
       border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background-color 0.3s;
     }
-
-    .build-button:hover {
-      background: #0056b3;
+    .run-button:hover {
+      background-color: #0056b3;
     }
-
-    h2 {
-      margin-top: 0;
+    /* 출력창 스타일 */
+    .output {
+      flex: 1;
+      padding: 20px;
+      background-color: #fff;
+      overflow: auto;
+    }
+    /* 텍스트 입력창 스타일 */
+    textarea {
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: none;
+      outline: none;
+      font-size: 16px;
     }
   </style>
 </head>
-
 <body>
   <div class="container">
-    <!-- 왼쪽 입력창 -->
-    <div class="input-pane">
-      <h2>입력</h2>
-      <textarea id="inputArea" placeholder="여기에 코드를 입력하세요..."></textarea>
+    <!-- 왼쪽: 텍스트 입력창 -->
+    <div class="left-panel">
+      <textarea id="inputText" placeholder="코드를 입력하세요..."></textarea>
     </div>
-    <!-- 오른쪽 출력창 -->
-    <div class="output-pane">
-      <button class="build-button" id="buildButton">빌드</button>
-      <h2>출력</h2>
-      <pre id="outputArea">빌드 결과가 여기에 표시됩니다.</pre>
+    <!-- 오른쪽: 실행 버튼과 출력창 -->
+    <div class="right-panel">
+      <div class="header">
+        <button id="runButton" class="run-button">실행</button>
+      </div>
+      <div id="output" class="output"></div>
     </div>
   </div>
 
+  <!-- Emscripten 설정 -->
   <script>
-    let wasmInstance = null;
-
-    // // WASM 모듈을 로드하는 함수
-    // async function loadWasm() {
-    //   try {
-    //     // module.wasm 파일을 로드하여 인스턴스화합니다.
-    //     const response = await fetch('korlang-compiler.wasm');
-    //     const bytes = await response.arrayBuffer();
-    //     const importObject = { env: {}, wasi_snapshot_preview1: "" };
-
-    //     const { instance } = await WebAssembly.instantiate(bytes, importObject);
-    //     console.log("WASM 모듈 로드 성공");
-    //     return instance;
-    //   } catch (err) {
-    //     console.error("WASM 로드 실패:", err);
-    //     return null;
-    //   }
-    // }
-
-    // 최소한의 WASI 폴리필 (필요한 함수만 추가)
-    // WASI 함수 호출이 발생하지 않는다면, 빈 함수나 간단한 대체 함수를 제공하면 됩니다.
-    const wasiPolyfill = {
-      proc_exit: (code) => { console.warn('WASI proc_exit called with code', code); },
-      fd_write: (fd, iovs, iovs_len, nwritten) => { 
-        // 최소한 성공 값 반환 (예: 0)
-        return 0; 
+    // Module 객체를 통해 Emscripten 런타임 및 출력 처리를 설정합니다.
+    var Module = {
+      // onRuntimeInitialized는 Emscripten이 완전히 초기화되었을 때 호출됩니다.
+      onRuntimeInitialized: function() {
+        console.log("WASM 모듈 로드 완료");
       },
-      fd_read: () => { return 0; },
-      fd_close: () => { return 0; },
-      clock_time_get: () => {return 0;},
-      fd_seek: () => {return 0;},
-      environ_sizes_get: () => {return 0;},
-      environ_get: () => {return 0},
-      // 추가로 필요한 WASI 함수가 있다면 여기에 추가하세요.
+      // Emscripten의 print 함수를 재정의하여 stdout을 출력창에 표시합니다.
+      print: function(text) {
+        var outputElem = document.getElementById("output");
+        outputElem.innerText += text + "\n";
+      },
+      printErr: function(text) {
+        console.error(text);
+      }
     };
+  </script>
+  <!-- Emscripten이 생성한 JS glue 코드 (index.js)를 로드합니다. -->
+  <script src="index.js"></script>
 
-    async function loadWasm() {
-      try {
-        const response = await fetch('korlang-compiler.wasm');
-        const bytes = await response.arrayBuffer();
+  <!-- 실행 버튼 클릭 처리 -->
+  <script>
+    document.getElementById('runButton').addEventListener('click', function() {
+      // 출력창 초기화
+      document.getElementById('output').innerText = '';
+      // 필요 시, 왼쪽 입력창의 코드를 Module에 전달하는 로직 추가 가능
+      // 예: var code = document.getElementById('inputText').value;
+      var code = document.getElementById('inputText').value;
 
-        const imports = {
-          // 필요한 다른 임포트가 있다면 env 객체에 추가
-          env: {
-            // 예시: js_log: (ptr, len) => { /* 구현 내용 */ },
-          },
-          wasi_snapshot_preview1: wasiPolyfill
-        };
-
-        const { instance } = await WebAssembly.instantiate(bytes, imports);
-        console.log("WASM 모듈 로드 성공");
-        return instance;
-      } catch (err) {
-        console.error("WASM 로드 실패:", err);
-        return null;
+      // 내보낸 함수가 "run" 이름으로 존재하는지 확인 후 호출
+      if (Module._run) {
+        Module._run(code);
+      } else if (Module.run) {
+        Module.run(code);
+      } else {
+        console.error("run 함수가 내보내지지 않았습니다.");
       }
-    }
-
-
-    // 빌드 버튼 클릭 시 실행되는 이벤트 핸들러
-    document.getElementById('buildButton').addEventListener('click', async () => {
-      const inputText = document.getElementById('inputArea').value;
-
-      // WASM 모듈이 아직 로드되지 않았다면 로드
-      if (!wasmInstance) {
-        wasmInstance = await loadWasm();
-        if (!wasmInstance) {
-          document.getElementById('outputArea').textContent = "WASM 모듈을 로드할 수 없습니다.";
-          return;
-        }
-      }
-
-      // 예시: WASM 모듈에 내보낸 compile_code 함수를 호출한다고 가정
-      // 실제로는 문자열을 WASM 메모리로 전달하고, 결과 문자열을 복원하는 과정이 필요합니다.
-      // 아래는 단순 예시로, compile_code 함수 없이 입력 텍스트를 그대로 출력합니다.
-      // 만약 compile_code 함수가 export 되어 있다면, 다음과 같이 호출할 수 있습니다:
-      // const outputPtr = wasmInstance.exports.compile_code(/* 매개변수 전달 */);
-      // const outputText = getStringFromMemory(outputPtr);
-
-      // 임시 동작: 입력 텍스트를 그대로 출력
-      document.getElementById('outputArea').textContent = "컴파일 결과:\n" + inputText;
-    });
-
-    // 페이지 로딩 시 WASM 모듈 미리 로드
-    loadWasm().then(instance => {
-      wasmInstance = instance;
     });
   </script>
 </body>
-
 </html>
