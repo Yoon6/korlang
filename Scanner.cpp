@@ -78,7 +78,7 @@ Token scanStringLiteral() {
         string += *(current++);
     }
     if (*current != '\"') {
-        cout << "문자열 종료 문자가 없습니다.";
+        cout << "문자열 종료 문자가 없습니다." << endl;
         exit(1);
     }
     current++;
@@ -110,7 +110,7 @@ Token scanOperatorAndPunctuator() {
     }
     if (string.empty())
     {
-        cout << *current << " 사용할 수 없는 문자입니다.";
+        cout << *current << " 사용할 수 없는 문자입니다." << endl;
         exit(1);
     }
     return Token{toKind(string), string};
@@ -144,7 +144,7 @@ vector<Token> scan(string sourceCode) {
                 result.push_back(scanOperatorAndPunctuator());
                 break;
             default:
-                cout << *current << " 사용할 수 없는 문자입니다.";
+                cout << *current << " 사용할 수 없는 문자입니다." << endl;
                 exit(1);
         }
     }

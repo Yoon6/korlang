@@ -25,7 +25,7 @@ void skipCurrent(Kind kind)
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	if (currentToken->kind != kind)
 	{
-		cout << converter.to_bytes(toString(kind)) << " 토큰이 필요합니다.";
+		cout << converter.to_bytes(toString(kind)) << " 토큰이 필요합니다." << endl;
 		exit(1);
 	}
 	currentToken++;
@@ -193,7 +193,7 @@ Expression* parseOperand()
 	case Kind::LeftBrace:     result = parseMapLiteral();       break;
 	case Kind::Identifier:    result = parseIdentifier();       break;
 	case Kind::LeftParen:     result = parseInnerExpression();  break;
-	default:                  cout << "잘못된 식입니다.";       exit(1);
+	default:                  cout << "잘못된 식입니다." << endl;       exit(1);
 	}
 
 	return parsePostfix(result);
@@ -352,7 +352,7 @@ Expression* parseAssignment()
 		return result;
 	}
 
-	cout << "대입 연산자의 왼쪽 피연산자가 변수나 배열, map 원소 참조가 아닙니다.";
+	cout << "대입 연산자의 왼쪽 피연산자가 변수나 배열, map 원소 참조가 아닙니다." << endl;
 	exit(1);
 }
 
@@ -400,7 +400,7 @@ For* parseFor()
 
 	if (result->variable->expression == nullptr)
 	{
-		cout << "for문에 초기화 식이 없습니다.";
+		cout << "for문에 초기화 식이 없습니다." << endl;
 		exit(1);
 	}
 
@@ -409,7 +409,7 @@ For* parseFor()
 	result->condition = parseExpression();
 	if (result->condition == nullptr)
 	{
-		cout << "for문에 조건식이 없습니다.";
+		cout << "for문에 조건식이 없습니다." << endl;
 		exit(1);
 	}
 
@@ -418,7 +418,7 @@ For* parseFor()
 	result->expression = parseExpression();
 	if (result->expression == nullptr)
 	{
-		cout << "for문에 증감식이 없습니다.";
+		cout << "for문에 증감식이 없습니다." << endl;
 		exit(1);
 	}
 
@@ -442,7 +442,7 @@ If* parseIf()
 		auto condition = parseExpression();
 		if (condition == nullptr)
 		{
-			cout << "if문에 조건식이 없습니다.";
+			cout << "if문에 조건식이 없습니다." << endl;
 			exit(1);
 		}
 		result->conditions.push_back(condition);
@@ -504,7 +504,7 @@ Return* parseReturn()
 	result->expression = parseExpression();
 	if (result->expression == nullptr)
 	{
-		cout << "반환문에 반환값이 없습니다.";
+		cout << "반환문에 반환값이 없습니다." << endl;
 		exit(1);
 	}
 
@@ -575,7 +575,7 @@ vector<Statement*> parseBlock()
 			result.push_back(parseContinue());
 			break;
 		case Kind::EndOfLine:
-			cout << *currentToken << " 잘못된 구문입니다.";
+			cout << *currentToken << " 잘못된 구문입니다." << endl;
 			exit(1);
 		default:
 			result.push_back(parseExpressionStatement());
@@ -634,7 +634,7 @@ Program* parse(vector<Token> tokenList) {
 			result->functions.push_back(parseFunction());
 			break;
 		default:
-			cout << *currentToken << " 잘못된 구문입니다.";
+			cout << *currentToken << " 잘못된 구문입니다." << endl;
 			exit(1);
 		}
 	}
